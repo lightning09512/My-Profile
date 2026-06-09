@@ -206,6 +206,13 @@ const showAttribution = import.meta.env.VITE_SHOW_ATTRIBUTION !== "false";
       opacity: 0.85;
       transition: opacity 0.2s ease;
 
+      @include mixins.mq("md") {
+        position: absolute;
+        bottom: var(--space-outer);
+        right: var(--space-outer);
+        margin-top: 0;
+      }
+
       &:hover {
         opacity: 1;
       }
