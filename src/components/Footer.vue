@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ref, onMounted } from "vue";
 import Social from "./Social.vue";
 import Link from "./Link.vue";
 import Clickable from "./Clickable.vue";
@@ -21,6 +22,18 @@ const handleBackToTop = () => {
 
 const { withSocial = true } = defineProps<Props>();
 const showAttribution = import.meta.env.VITE_SHOW_ATTRIBUTION !== "false";
+
+const visitCount = ref<number | null>(null);
+
+onMounted(async () => {
+  try {
+    const response = await fetch("https://api.counterapi.dev/v1/lightning09512/portfolio/up");
+    const data = await response.json();
+    visitCount.value = data.count;
+  } catch (error) {
+    console.error("Failed to fetch visitor count:", error);
+  }
+});
 </script>
 
 <template>
@@ -101,6 +114,9 @@ const showAttribution = import.meta.env.VITE_SHOW_ATTRIBUTION !== "false";
           </Clickable>
         </div>
         <p>© {{ new Date().getFullYear() }} Nguyễn Minh Quốc Khánh</p>
+        <div class="footer-credits-visitor">
+          <p v-if="visitCount !== null">Lượt truy cập: {{ visitCount }}</p>
+        </div>
       </div>
     </div>
   </footer>
@@ -193,6 +209,21 @@ const showAttribution = import.meta.env.VITE_SHOW_ATTRIBUTION !== "false";
       flex-direction: row;
       align-items: center;
       gap: var(--space-xxs);
+    }
+
+    &-visitor {
+      margin-top: var(--space-xs);
+      opacity: 0.85;
+      transition: opacity 0.2s ease;
+
+      &:hover {
+        opacity: 1;
+      }
+
+      img {
+        display: block;
+        height: 20px;
+      }
     }
   }
 
