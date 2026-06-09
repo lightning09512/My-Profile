@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import Button from "./Button.vue";
 import Logo from "./Logo.vue";
-import { computed, ref, onBeforeUnmount } from "vue";
+import { computed, ref } from "vue";
 import { t } from "../i18n/utils/translate";
 import { useHeaderTheme } from "../composables/useHeaderTheme";
 import { lenis } from "../composables/useScroll";
@@ -16,27 +16,6 @@ import { useFirstRoute } from "../composables/useFirstRoute";
 
 const router = useRouter();
 const { isFirstRoute } = useFirstRoute();
-
-const showTooltip = ref(false);
-let tooltipTimeout: number | undefined;
-
-const handleContactClick = () => {
-  const mailItem = social.find((item) => item.name === "mail");
-  if (!mailItem) return;
-  const email = mailItem.url.replace("mailto:", "");
-  
-  navigator.clipboard.writeText(email).then(() => {
-    showTooltip.value = true;
-    if (tooltipTimeout) clearTimeout(tooltipTimeout);
-    tooltipTimeout = window.setTimeout(() => {
-      showTooltip.value = false;
-    }, 2000);
-  });
-};
-
-onBeforeUnmount(() => {
-  if (tooltipTimeout) clearTimeout(tooltipTimeout);
-});
 
 const scrolledPastHeroVisible = ref(false);
 const { isDarkTheme } = useHeaderTheme({
@@ -117,23 +96,17 @@ const getInTouchClassNames = computed(() => {
       <Logo class="header-logo-image" />
     </div>
     <div class="header-right">
-      <div class="header-contact-container">
-        <Button
-          renderAs="button"
-          variant="accent"
-          :aria-label="t('get-in-touch')"
-          @click="handleContactClick"
-          :class="getInTouchClassNames"
-          data-cursor="circle-white"
-          data-hoversound="hover"
-          >{{ t("get-in-touch") }}</Button
-        >
-        <Transition name="fade">
-          <div v-if="showTooltip" class="header-contact-tooltip">
-            {{ t("email-copied") }}
-          </div>
-        </Transition>
-      </div>
+      <Button
+        renderAs="a"
+        variant="accent"
+        :aria-label="t('get-in-touch')"
+        :href="social.find((item) => item.name === 'mail')?.url ?? ''"
+        external
+        :class="getInTouchClassNames"
+        data-cursor="circle-white"
+        data-hoversound="hover"
+        >{{ t("get-in-touch") }}</Button
+      >
       <SoundsToggle class="header-sounds-toggle" :isDarkTheme="isDarkTheme" v-if="isFeatureEnabled('sounds')" />
     </div>
   </header>
@@ -205,44 +178,6 @@ const getInTouchClassNames = computed(() => {
     gap: var(--space-sm);
   }
 
-  &-contact {
-    &-container {
-      position: relative;
-      display: flex;
-      align-items: center;
-    }
-
-    &-tooltip {
-      position: absolute;
-      top: -45px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: var(--color-black-400, #181716);
-      color: var(--color-white-400, #fcfbf9);
-      padding: 6px 14px;
-      border-radius: 20px;
-      font-size: 12px;
-      font-weight: 700;
-      white-space: nowrap;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      pointer-events: none;
-      z-index: 10;
-      
-      &::after {
-        content: '';
-        position: absolute;
-        bottom: -6px;
-        left: 50%;
-        transform: translateX(-50%);
-        border-width: 6px 6px 0;
-        border-style: solid;
-        border-color: var(--color-black-400, #181716) transparent transparent;
-        display: block;
-        width: 0;
-      }
-    }
-  }
-
   &-music-toggle {
     display: flex;
   }
@@ -299,16 +234,5 @@ const getInTouchClassNames = computed(() => {
       }
     }
   }
-}
-
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.2s ease, transform 0.2s ease;
-}
-
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
-  transform: translate(-50%, 5px);
 }
 </style>
