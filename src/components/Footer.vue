@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
 import Social from "./Social.vue";
 import Link from "./Link.vue";
 import Clickable from "./Clickable.vue";
@@ -22,18 +21,6 @@ const handleBackToTop = () => {
 
 const { withSocial = true } = defineProps<Props>();
 const showAttribution = import.meta.env.VITE_SHOW_ATTRIBUTION !== "false";
-
-const visitCount = ref<number | null>(null);
-
-onMounted(async () => {
-  try {
-    const response = await fetch("https://api.counterapi.dev/v1/lightning09512/portfolio/up");
-    const data = await response.json();
-    visitCount.value = data.count;
-  } catch (error) {
-    console.error("Failed to fetch visitor count:", error);
-  }
-});
 </script>
 
 <template>
@@ -115,7 +102,10 @@ onMounted(async () => {
         </div>
         <p>© {{ new Date().getFullYear() }} Nguyễn Minh Quốc Khánh</p>
         <div class="footer-credits-visitor">
-          <p v-if="visitCount !== null">Lượt truy cập: {{ visitCount }}</p>
+          <img
+            src="https://api.visitorbadge.io/api/visitors?path=https%3A%2F%2Fmy-profile-theta.vercel.app%2F&label=Views&labelColor=%235c5c5c&countColor=%23c084fc&style=flat-square"
+            alt="Visitor Counter"
+          />
         </div>
       </div>
     </div>
